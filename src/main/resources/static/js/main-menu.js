@@ -7,7 +7,7 @@ function setPermissions() {
     return;
   }
 
-  if (role === "Funcionário") {
+  if (role === "EMPLOYEE") {
     document.getElementById("btnEditProduct").disabled = true;
     document.getElementById("btnRegisterProduct").disabled = true;
     document.getElementById("btnSalesReport").disabled = true;

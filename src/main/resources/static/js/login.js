@@ -50,7 +50,7 @@ btnEnter.addEventListener("click", async () => {
     localStorage.setItem("token", data.token);
     localStorage.setItem("role", data.role);
 
-    showMessage(`Olá ${login}, sua permissão é de ${data.role}. Seja bem-vindo!`);
+    showMessage(`Olá ${login}, sua permissão é de ${data.roleLabel}. Seja bem-vindo!`);
 
     window.location.href = "main-menu.html";
   } catch (err) {

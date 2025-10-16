@@ -1,23 +1,33 @@
-let products = [
-    { id: 1, name: "Produto A", category: "Bebidas", price: 10.5, unit: "Unidade", stock: 50 },
-    { id: 2, name: "Produto B", category: "Alimentos", price: 5.0, unit: "Kg", stock: 30 }
-];
-let originalStock = JSON.parse(JSON.stringify(products));
+let products = [];
 let cart = [];
 
-function loadProducts() {
+function getAuthHeaders() {
+    return {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + localStorage.getItem("token")
+    };
+}
+
+async function loadProducts() {
+    const response = await fetch("/products", { headers: getAuthHeaders() });
+    if (!response.ok) {
+        alert("Erro ao carregar produtos");
+        return;
+    }
+    products = await response.json();
+
     const tbody = document.querySelector("#productsTable tbody");
     tbody.innerHTML = "";
     products.forEach(p => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-      <td>${p.id}</td>
-      <td>${p.name}</td>
-      <td>${p.category}</td>
-      <td>${p.price.toFixed(2)}</td>
-      <td>${p.unit}</td>
-      <td>${p.stock}</td>
-    `;
+    <td>${p.id}</td>
+    <td>${p.name}</td>
+    <td>${p.category}</td>
+    <td>${Number(p.unitPrice || 0).toFixed(2)}</td>
+    <td>${p.unitOfMeasure}</td>
+    <td>${p.quantity}</td>
+  `;
         tr.addEventListener("click", () => {
             document.querySelectorAll("#productsTable tr").forEach(row => row.classList.remove("selected"));
             tr.classList.add("selected");
@@ -29,16 +39,27 @@ function loadProducts() {
 function renderCart() {
     const tbody = document.querySelector("#cartTable tbody");
     tbody.innerHTML = "";
+
+    const grouped = {};
     cart.forEach(item => {
+        if (grouped[item.productId]) {
+            grouped[item.productId].quantity += item.quantity;
+        } else {
+            grouped[item.productId] = { ...item };
+        }
+    });
+
+    Object.values(grouped).forEach(item => {
+        const product = products.find(p => p.id === item.productId);
         const tr = document.createElement("tr");
         tr.innerHTML = `
-      <td>${item.id}</td>
-      <td>${item.name}</td>
-      <td>${item.category}</td>
-      <td>${item.qty}</td>
-      <td>${item.price.toFixed(2)}</td>
-      <td>${item.unit}</td>
-    `;
+            <td>${item.productId}</td>
+            <td>${product ? product.name : ""}</td>
+            <td>${product ? product.category : ""}</td>
+            <td>${item.quantity}</td>
+            <td>${product ? Number(product.unitPrice || 0).toFixed(2) : "0.00"}</td>
+            <td>${product ? product.unitOfMeasure : ""}</td>
+        `;
         tr.addEventListener("click", () => {
             document.querySelectorAll("#cartTable tr").forEach(row => row.classList.remove("selected"));
             tr.classList.add("selected");
@@ -47,7 +68,15 @@ function renderCart() {
     });
 }
 
-document.getElementById("btnAddProduct").addEventListener("click", () => {
+async function refreshCart() {
+    const response = await fetch("/cart", { headers: getAuthHeaders() });
+    if (response.ok) {
+        cart = await response.json();
+        renderCart();
+    }
+}
+
+document.getElementById("btnAddProduct").addEventListener("click", async () => {
     const selected = document.querySelector("#productsTable tr.selected");
     if (!selected) {
         alert("Selecione um produto.");
@@ -60,77 +89,115 @@ document.getElementById("btnAddProduct").addEventListener("click", () => {
         return;
     }
 
-    const product = products.find(p => p.id === id);
-    if (qty > product.stock) {
-        alert("Quantidade solicitada maior que o estoque disponível.");
+    const response = await fetch(`/cart/add?productId=${id}&qty=${qty}`, {
+        method: "POST",
+        headers: getAuthHeaders()
+    });
+
+    if (!response.ok) {
+        alert("Erro ao adicionar produto ao carrinho");
         return;
     }
 
-    product.stock -= qty;
-
-    const existing = cart.find(c => c.id === id);
-    if (existing) {
-        existing.qty += qty;
-    } else {
-        cart.push({ ...product, qty });
-    }
-
+    cart = await response.json();
     renderCart();
     loadProducts();
     document.getElementById("productQuantity").value = "";
 });
 
-document.getElementById("btnRemoveItem").addEventListener("click", () => {
+document.getElementById("btnRemoveItem").addEventListener("click", async () => {
     const selected = document.querySelector("#cartTable tr.selected");
     if (!selected) {
         alert("Selecione um item para remover.");
         return;
     }
     const id = parseInt(selected.cells[0].textContent);
-    const item = cart.find(c => c.id === id);
 
-    const product = products.find(p => p.id === id);
-    product.stock += item.qty;
+    const response = await fetch(`/cart/remove?productId=${id}`, {
+        method: "POST",
+        headers: getAuthHeaders()
+    });
 
-    cart = cart.filter(c => c.id !== id);
+    if (!response.ok) {
+        alert("Erro ao remover item do carrinho");
+        return;
+    }
+
+    cart = await response.json();
     renderCart();
     loadProducts();
 });
 
 document.getElementById("btnCalculateTotal").addEventListener("click", () => {
-    const total = cart.reduce((sum, item) => sum + item.qty * item.price, 0);
+    const total = cart.reduce((sum, item) => {
+        const product = products.find(p => p.id === item.productId);
+        return sum + item.quantity * (product ? product.unitPrice : 0);
+    }, 0);
     document.getElementById("totalValue").textContent = `Valor Total: R$ ${total.toFixed(2)}`;
 });
 
-document.getElementById("btnClearCart").addEventListener("click", () => {
-    products = JSON.parse(JSON.stringify(originalStock));
-    cart = [];
+document.getElementById("btnClearCart").addEventListener("click", async () => {
+    const response = await fetch("/cart/clear", {
+        method: "POST",
+        headers: getAuthHeaders()
+    });
+
+    if (!response.ok) {
+        alert("Erro ao limpar carrinho");
+        return;
+    }
+
+    cart = await response.json();
     renderCart();
     loadProducts();
     document.getElementById("totalValue").textContent = "Valor Total: R$ 0,00";
 });
 
-document.getElementById("btnFinalizeSale").addEventListener("click", () => {
+document.getElementById("btnFinalizeSale").addEventListener("click", async () => {
     if (cart.length === 0) {
         alert("Carrinho vazio.");
         return;
     }
-    alert("Venda finalizada com sucesso!");
-    cart = [];
-    renderCart();
+
+    const cartDTO = {
+        items: cart.map(item => ({
+            productId: item.productId,
+            quantity: item.quantity
+        }))
+    };
+
+    const response = await fetch("/sales", {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(cartDTO)
+    });
+
+    if (!response.ok) {
+        alert("Erro ao finalizar a venda.");
+        return;
+    }
+
+    const sale = await response.json();
+    alert(`Venda finalizada com sucesso! Código da venda: ${sale.id}`);
+
+    await fetch("/cart/clear", {
+        method: "POST",
+        headers: getAuthHeaders()
+    });
+    await refreshCart();
     loadProducts();
     document.getElementById("totalValue").textContent = "Valor Total: R$ 0,00";
-    originalStock = JSON.parse(JSON.stringify(products));
 });
 
 document.getElementById("menuLeave").addEventListener("click", () => {
     if (confirm("Deseja sair?")) {
-        window.location.href = "../login/index.html";
+        localStorage.clear();
+        window.location.href = "../login.html";
     }
 });
 
-const currentUser = { userType: "ADMIN" };
-if (currentUser.userType === "EMPLOYEE") {
+const role = localStorage.getItem("role");
+if (role === "EMPLOYEE") {
     document.getElementById("menuRegisterProduct").style.pointerEvents = "none";
     document.getElementById("menuRegisterProduct").style.opacity = "0.5";
     document.getElementById("menuEditProduct").style.pointerEvents = "none";
@@ -140,4 +207,4 @@ if (currentUser.userType === "EMPLOYEE") {
 }
 
 loadProducts();
-renderCart();
+refreshCart();

@@ -2,8 +2,8 @@ package com.sales_control.pi.service;
 
 import static java.util.Objects.nonNull;
 
-import com.sales_control.pi.dto.ProductDTO;
 import com.sales_control.pi.dto.UpdateProductDTO;
+import com.sales_control.pi.dto.response.ProductResponseDTO;
 import com.sales_control.pi.entity.ProductEntity;
 import com.sales_control.pi.exception.ValidationException;
 import com.sales_control.pi.repository.ProductRepository;
@@ -18,16 +18,16 @@ public class ProductService {
 
   private final ProductRepository repo;
 
-  public List<ProductDTO> findAllDTO() {
+  public List<ProductResponseDTO> findAllDTO() {
     return repo.findAll().stream().map(this::toDTO).toList();
   }
 
-  public List<ProductDTO> searchByName(String name) {
+  public List<ProductResponseDTO> searchByName(String name) {
     return repo.findByNameContainingIgnoreCase(name).stream().map(this::toDTO).toList();
   }
 
   @Transactional
-  public ProductDTO update(Integer id, UpdateProductDTO dto) {
+  public ProductResponseDTO update(Integer id, UpdateProductDTO dto) {
     var p = repo.findById(id).orElseThrow(() -> new ValidationException("Produto não encontrado"));
     if (nonNull(dto.unitPrice())) {
       if (dto.unitPrice() < 0) throw new ValidationException("Preço inválido");
@@ -45,13 +45,13 @@ public class ProductService {
     repo.deleteById(id);
   }
 
-  private ProductDTO toDTO(ProductEntity p) {
-    return ProductDTO.builder()
+  private ProductResponseDTO toDTO(ProductEntity p) {
+    return ProductResponseDTO.builder()
         .id(p.getId())
         .name(p.getName())
-        .category(p.getCategory())
+        .category(p.getCategory().getTranslation())
         .unitPrice(p.getUnitPrice())
-        .unitOfMeasure(p.getUnitOfMeasure())
+        .unitOfMeasure(p.getUnitOfMeasure().getTranslation())
         .quantity(p.getQuantity())
         .build();
   }

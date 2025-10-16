@@ -5,10 +5,12 @@ import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Builder
 @Getter
 @Setter
 @Embeddable
@@ -17,20 +19,21 @@ import lombok.Setter;
 public class SaleProductId implements Serializable {
 
   @Column(name = "venda_id")
-  private Integer vendaId;
+  private Integer saleId;
 
   @Column(name = "produto_id")
-  private Integer produtoId;
+  private Integer productId;
 
   @Override
   public boolean equals(Object o) {
-    if (this.equals(o)) return true;
-    if (!(o instanceof SaleProductId that)) return false;
-    return vendaId.equals(that.vendaId) && produtoId.equals(that.produtoId);
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    SaleProductId that = (SaleProductId) o;
+    return Objects.equals(saleId, that.saleId) && Objects.equals(productId, that.productId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(vendaId, produtoId);
+    return Objects.hash(saleId, productId);
   }
 }

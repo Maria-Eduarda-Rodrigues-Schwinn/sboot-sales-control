@@ -9,6 +9,7 @@ import com.sales_control.pi.dto.SaleFilterDTO;
 import com.sales_control.pi.dto.SaleProductDTO;
 import com.sales_control.pi.entity.SaleEntity;
 import com.sales_control.pi.entity.SaleProductEntity;
+import com.sales_control.pi.entity.SaleProductId;
 import com.sales_control.pi.exception.SaleValidationException;
 import com.sales_control.pi.repository.ProductRepository;
 import com.sales_control.pi.repository.SaleRepository;
@@ -39,7 +40,13 @@ public class SaleService {
       throw new SaleValidationException("Carrinho vazio");
 
     var sale =
-        SaleEntity.builder().saleDate(LocalDateTime.now()).productsSold(new ArrayList<>()).build();
+        SaleEntity.builder()
+            .saleDate(LocalDateTime.now())
+            .totalValue(0.0)
+            .productsSold(new ArrayList<>())
+            .build();
+
+    sale = saleRepo.save(sale);
 
     var total = 0.0;
 
@@ -48,34 +55,38 @@ public class SaleService {
           productRepo
               .findById(item.productId())
               .orElseThrow(() -> new SaleValidationException("Produto não encontrado"));
+
       var sp =
           SaleProductEntity.builder()
+              .id(SaleProductId.builder().saleId(sale.getId()).productId(product.getId()).build())
               .saleEntity(sale)
               .product(product)
               .quantity(item.quantity())
+              .unitPrice(product.getUnitPrice())
+              .totalValue(product.getUnitPrice() * item.quantity())
               .build();
 
       sale.getProductsSold().add(sp);
-
-      total += product.getUnitPrice() * item.quantity();
+      total += sp.getTotalValue();
     }
 
     sale = sale.toBuilder().totalValue(total).build();
-    var saved = saleRepo.save(sale);
+
+    saleRepo.save(sale);
 
     return SaleDTO.builder()
-        .id(saved.getId())
-        .saleDate(saved.getSaleDate())
-        .totalValue(saved.getTotalValue())
+        .id(sale.getId())
+        .saleDate(sale.getSaleDate())
+        .totalValue(sale.getTotalValue())
         .productsSold(
-            saved.getProductsSold().stream()
+            sale.getProductsSold().stream()
                 .map(
                     sp ->
                         SaleProductDTO.builder()
                             .productId(sp.getProduct().getId())
                             .name(sp.getProduct().getName())
                             .category(sp.getProduct().getCategory())
-                            .unitPrice(sp.getProduct().getUnitPrice())
+                            .unitPrice(sp.getUnitPrice())
                             .unitOfMeasure(sp.getProduct().getUnitOfMeasure())
                             .quantity(sp.getQuantity())
                             .build())

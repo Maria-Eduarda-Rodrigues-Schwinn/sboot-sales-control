@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,18 +16,19 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "venda_produto")
+@Entity
+@Table(name = "venda_produto")
 public class SaleProductEntity {
 
   @EmbeddedId private SaleProductId id;
 
   @ManyToOne
-  @MapsId("vendaId")
+  @MapsId("saleId")
   @JoinColumn(name = "venda_id")
   private SaleEntity saleEntity;
 
   @ManyToOne
-  @MapsId("produtoId")
+  @MapsId("productId")
   @JoinColumn(name = "produto_id")
   private ProductEntity product;
 

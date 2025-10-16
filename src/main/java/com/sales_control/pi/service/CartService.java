@@ -16,13 +16,27 @@ public class CartService {
 
   @Transactional
   public void addItem(List<CartItemDTO> cart, Integer productId, Integer qty) {
-    var p =
+    var product =
         productRepo
             .findById(productId)
             .orElseThrow(() -> new CartOperationException("Produto não encontrado"));
-    if (qty <= 0 || p.getQuantity() < qty) throw new CartOperationException("Estoque insuficiente");
-    p.setQuantity(p.getQuantity() - qty);
-    cart.add(CartItemDTO.builder().productId(productId).quantity(qty).build());
+
+    if (qty <= 0 || product.getQuantity() < qty)
+      throw new CartOperationException("Estoque insuficiente");
+
+    var existingItem = cart.stream().filter(i -> i.productId().equals(productId)).findFirst();
+
+    if (existingItem.isPresent()) {
+      var item = existingItem.get();
+      var newQty = item.quantity() + qty;
+
+      cart.remove(item);
+      cart.add(CartItemDTO.builder().productId(productId).quantity(newQty).build());
+    } else {
+      cart.add(CartItemDTO.builder().productId(productId).quantity(qty).build());
+    }
+
+    product.setQuantity(product.getQuantity() - qty);
   }
 
   @Transactional

@@ -1,7 +1,7 @@
 package com.sales_control.pi.controller;
 
-import com.sales_control.pi.dto.ProductDTO;
 import com.sales_control.pi.dto.UpdateProductDTO;
+import com.sales_control.pi.dto.response.ProductResponseDTO;
 import com.sales_control.pi.service.ProductService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,17 +24,17 @@ public class ProductController {
   private final ProductService service;
 
   @GetMapping
-  public List<ProductDTO> list() {
+  public List<ProductResponseDTO> list() {
     return service.findAllDTO();
   }
 
   @GetMapping("/search")
-  public List<ProductDTO> search(@RequestParam String name) {
+  public List<ProductResponseDTO> search(@RequestParam String name) {
     return service.searchByName(name);
   }
 
   @PutMapping("/{id}")
-  public ProductDTO update(@PathVariable Integer id, @RequestBody UpdateProductDTO dto) {
+  public ProductResponseDTO update(@PathVariable Integer id, @RequestBody UpdateProductDTO dto) {
     return service.update(id, dto);
   }
 
