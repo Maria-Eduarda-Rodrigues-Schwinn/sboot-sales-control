@@ -1,0 +1,134 @@
+:root {
+    --bg-app: rgb(196, 211, 231);
+    --bg-card: #ffffff;
+    --text: #111;
+    --border: #000;
+    --primary: rgb(71, 104, 149);
+    --primary-hover: rgb(50, 80, 120);
+    --radius: 8px;
+    --shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: "Bitstream Charter", "Georgia", serif;
+    background-color: var(--bg-app);
+    color: var(--text);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 40px 16px;
+    background-color: var(--bg-card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.login-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background-color: var(--bg-app);
+}
+
+.title {
+    font-size: 36px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.btn-power {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.btn-power img {
+    width: 28px;
+    height: 28px;
+}
+
+.btn-power:focus-visible,
+.btn-enter:focus-visible,
+.input:focus-visible {
+    outline: 3px solid rgba(71, 104, 149, 0.4);
+    outline-offset: 2px;
+}
+
+.login-content {
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.logo {
+    width: 120px;
+    height: auto;
+    margin-bottom: 18px;
+}
+
+.label {
+    align-self: stretch;
+    font-size: 18px;
+    margin-top: 10px;
+}
+
+.input {
+    width: 100%;
+    height: 40px;
+    font-size: 18px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin-top: 6px;
+}
+
+.btn-enter {
+    margin-top: 28px;
+    width: 60%;
+    min-width: 180px;
+    height: 50px;
+    font-size: 18px;
+    background-color: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.btn-enter:hover {
+    background-color: var(--primary-hover);
+}
+
+@media (max-width: 420px) {
+    .title {
+        font-size: 28px;
+    }
+
+    .btn-enter {
+        width: 100%;
+    }
+}

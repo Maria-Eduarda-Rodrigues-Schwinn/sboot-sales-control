@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Relatório de Vendas - SalesControl</title>
+    <link rel="stylesheet" href="sales-report.css" />
+</head>
+
+<body>
+    <header class="menu-bar">
+        <nav>
+            <ul>
+                <li><a href="../register-sale/register-sale.html" id="menuRegisterSale">Registrar Venda</a></li>
+                <li><a href="../register-product/register-product.html" id="menuRegisterProduct">Cadastrar Produto</a></li>
+                <li><a href="../edit-product/edit-product.html" id="menuEditProduct">Editar Produto</a></li>
+                <li><a href="#" id="menuLeave">Sair</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="report-container">
+        <div class="header">
+            <img src="../images/report-logo.png" alt="Logo" class="logo" />
+            <h1>Relatórios</h1>
+        </div>
+
+        <div class="filters">
+            <input type="text" id="productName" placeholder="Nome do produto" />
+            <select id="categoryFilter">
+                <option value="Todas">Todas</option>
+                <option value="Bebidas">Bebidas</option>
+                <option value="Alimentos">Alimentos</option>
+            </select>
+        </div>
+
+        <div class="date-filters">
+            <label>De:</label>
+            <input type="date" id="fromDate" />
+            <label>Até:</label>
+            <input type="date" id="toDate" />
+        </div>
+
+        <div class="action-buttons">
+            <button id="btnFilter">Filtrar</button>
+            <button id="btnShowAll">Mostrar todos</button>
+        </div>
+
+        <table id="salesTable">
+            <thead>
+                <tr>
+                    <th>ID Venda</th>
+                    <th>Data da Venda</th>
+                    <th>Nome do Produto</th>
+                    <th>Preço Unitário (R$)</th>
+                    <th>Unidade</th>
+                    <th>Quantidade</th>
+                    <th>Valor Total</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <button id="btnExport">Exportar</button>
+    </main>
+
+    <script src="sales-report.js"></script>
+</body>
+
+</html>

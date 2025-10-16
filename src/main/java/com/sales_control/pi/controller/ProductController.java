@@ -1,0 +1,45 @@
+package com.sales_control.pi.controller;
+
+import com.sales_control.pi.dto.ProductDTO;
+import com.sales_control.pi.dto.UpdateProductDTO;
+import com.sales_control.pi.service.ProductService;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@CrossOrigin
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/products")
+public class ProductController {
+
+  private final ProductService service;
+
+  @GetMapping
+  public List<ProductDTO> list() {
+    return service.findAllDTO();
+  }
+
+  @GetMapping("/search")
+  public List<ProductDTO> search(@RequestParam String name) {
+    return service.searchByName(name);
+  }
+
+  @PutMapping("/{id}")
+  public ProductDTO update(@PathVariable Integer id, @RequestBody UpdateProductDTO dto) {
+    return service.update(id, dto);
+  }
+
+  @DeleteMapping("/{id}")
+  public void delete(@PathVariable Integer id) {
+    service.delete(id);
+  }
+}

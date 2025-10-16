@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login - SalesControl</title>
+    <link rel="stylesheet" href="../css/login.css" />
+</head>
+
+<body>
+    <div class="login-container">
+        <header class="login-header">
+            <h1 class="title">Login</h1>
+            <button class="btn-power" id="btnPower" title="Sair">
+                <img src="../images/power.png" alt="Sair" />
+            </button>
+        </header>
+
+        <main class="login-content" role="main">
+            <img src="../images/logo.png" alt="Logo da aplicação" class="logo" id="logo" />
+
+            <label for="username" class="label">Login</label>
+            <input type="text" id="username" class="input" placeholder="Usuário ou e-mail"
+                title="Preencha com nome de usuário ou e-mail" autocomplete="username" required />
+
+            <label for="password" class="label">Senha</label>
+            <input type="password" id="password" class="input" placeholder="Digite sua senha"
+                title="Preencha com a senha" autocomplete="current-password" required />
+
+            <button id="btnEnter" class="btn-enter" title="Clique para entrar">Entrar</button>
+        </main>
+    </div>
+
+    <script src="../js/login.js"></script>
+</body>
+
+</html>

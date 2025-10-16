@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Registrar Venda - SalesControl</title>
+    <link rel="stylesheet" href="register-sale.css" />
+</head>
+
+<body>
+    <header class="menu-bar">
+        <nav>
+            <ul>
+                <li><a href="../register-product/register-product.html" id="menuRegisterProduct">Cadastrar Produto</a></li>
+                <li><a href="../edit-product/edit-product.html" id="menuEditProduct">Editar Produto</a></li>
+                <li><a href="../sales-report/sales-report.html" id="menuSalesReport">Relatório de Vendas</a></li>
+                <li><a href="#" id="menuLeave">Sair</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="sale-container">
+        <div class="titles">
+            <h1>Produtos</h1>
+            <img src="../images/logo.png" alt="Logo" class="logo" />
+            <h1>Carrinho</h1>
+        </div>
+
+        <div class="tables">
+            <div class="products-section">
+                <table id="productsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Categoria</th>
+                            <th>Preço Unitário (R$)</th>
+                            <th>Unidade</th>
+                            <th>Quantidade</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <input type="number" id="productQuantity" placeholder="Quantidade" min="1" />
+                <button id="btnAddProduct">Adicionar</button>
+            </div>
+
+            <div class="cart-section">
+                <table id="cartTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Categoria</th>
+                            <th>Quantidade</th>
+                            <th>Preço Unitário (R$)</th>
+                            <th>Unidade</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div class="cart-actions">
+                    <button id="btnRemoveItem">Remover produto do carrinho</button>
+                    <button id="btnCalculateTotal">Calcular valor total</button>
+                </div>
+                <div id="totalValue">Valor Total: R$ 0,00</div>
+                <div class="final-actions">
+                    <button id="btnClearCart">Limpar carrinho</button>
+                    <button id="btnFinalizeSale">Finalizar</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="register-sale.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,66 @@
+body {
+    font-family: "Bitstream Charter", serif;
+    background-color: rgb(196, 211, 231);
+    margin: 0;
+}
+
+.menu-bar {
+    background-color: white;
+    padding: 10px;
+}
+
+.menu-bar ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+}
+
+.menu-bar a {
+    text-decoration: none;
+    color: black;
+}
+
+.report-container {
+    padding: 20px;
+}
+
+.header {
+    text-align: center;
+}
+
+.logo {
+    max-width: 100px;
+}
+
+.filters,
+.date-filters,
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin: 10px 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th,
+td {
+    border: 1px solid #ccc;
+    padding: 6px;
+    text-align: center;
+}
+
+button {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+#salesTable tr.selected td {
+    background-color: #cce5ff;
+}

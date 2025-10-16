@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Editar Produto - SalesControl</title>
+    <link rel="stylesheet" href="edit-product.css" />
+</head>
+
+<body>
+    <header class="menu-bar">
+        <nav>
+            <ul>
+                <li><a href="../register-sale/register-sale.html" id="menuRegisterSale">Registrar Venda</a></li>
+                <li><a href="../register-product/register-product.html" id="menuRegisterProduct">Cadastrar Produto</a></li>
+                <li><a href="../sales-report/sales-report.html" id="menuSalesReport">Relatório de Vendas</a></li>
+                <li><a href="#" id="menuLeave">Sair</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="edit-container">
+        <h1>Produtos</h1>
+
+        <div class="search-actions">
+            <button id="btnSearch">Pesquisar</button>
+            <button id="btnLoadAll">Mostrar todos</button>
+        </div>
+
+        <table id="productsTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Categoria</th>
+                    <th>Preço Unitário (R$)</th>
+                    <th>Unidade</th>
+                    <th>Quantidade</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <div class="edit-actions">
+            <button id="btnDelete" class="danger">Excluir selecionado</button>
+            <button id="btnEdit">Editar selecionado</button>
+        </div>
+    </main>
+
+    <script src="edit-product.js"></script>
+</body>
+
+</html>
