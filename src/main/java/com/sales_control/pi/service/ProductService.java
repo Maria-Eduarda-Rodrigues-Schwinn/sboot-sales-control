@@ -3,8 +3,11 @@ package com.sales_control.pi.service;
 import static java.util.Objects.nonNull;
 
 import com.sales_control.pi.dto.UpdateProductDTO;
+import com.sales_control.pi.dto.request.CreateProductRequestDTO;
 import com.sales_control.pi.dto.response.ProductResponseDTO;
 import com.sales_control.pi.entity.ProductEntity;
+import com.sales_control.pi.enumeration.CategoryEnum;
+import com.sales_control.pi.enumeration.UnitOfMeasureEnum;
 import com.sales_control.pi.exception.ValidationException;
 import com.sales_control.pi.repository.ProductRepository;
 import jakarta.transaction.Transactional;
@@ -24,6 +27,23 @@ public class ProductService {
 
   public List<ProductResponseDTO> searchByName(String name) {
     return repo.findByNameContainingIgnoreCase(name).stream().map(this::toDTO).toList();
+  }
+
+  @Transactional
+  public ProductResponseDTO create(CreateProductRequestDTO dto) {
+    if (dto.unitPrice() < 0) throw new ValidationException("Preço inválido");
+    if (dto.quantity() < 0) throw new ValidationException("Quantidade inválida");
+
+    var product =
+        ProductEntity.builder()
+            .name(dto.name())
+            .unitPrice(dto.unitPrice())
+            .quantity(dto.quantity())
+            .category(CategoryEnum.fromTranslation(dto.category()))
+            .unitOfMeasure(UnitOfMeasureEnum.fromTranslation(dto.unitOfMeasure()))
+            .build();
+
+    return toDTO(repo.save(product));
   }
 
   @Transactional

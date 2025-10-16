@@ -1,5 +1,12 @@
 package com.sales_control.pi.enumeration;
 
+import com.sales_control.pi.exception.ValidationException;
+import java.util.Arrays;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum CategoryEnum {
   FOOD("Alimentos"),
   BEVERAGES("Bebidas"),
@@ -14,11 +21,10 @@ public enum CategoryEnum {
 
   private final String translation;
 
-  CategoryEnum(String translation) {
-    this.translation = translation;
-  }
-
-  public String getTranslation() {
-    return translation;
+  public static CategoryEnum fromTranslation(String translation) {
+    return Arrays.stream(values())
+        .filter(c -> c.translation.equalsIgnoreCase(translation))
+        .findFirst()
+        .orElseThrow(() -> new ValidationException("Categoria inválida"));
   }
 }

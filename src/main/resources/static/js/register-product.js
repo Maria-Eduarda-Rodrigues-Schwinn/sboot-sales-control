@@ -1,64 +1,107 @@
-const categories = ["Bebidas", "Alimentos", "Limpeza"];
-const units = ["Unidade", "Litro", "Quilo"];
+function getAuthHeaders() {
+    return {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + localStorage.getItem("token")
+    };
+}
 
-const categorySelect = document.getElementById("category");
-categories.forEach(cat => {
-    const opt = document.createElement("option");
-    opt.value = cat;
-    opt.textContent = cat;
-    categorySelect.appendChild(opt);
-});
+async function loadCategoriesAndUnits() {
+    try {
+        const [catRes, unitRes] = await Promise.all([
+            fetch("/products/categories", { headers: getAuthHeaders() }),
+            fetch("/products/units", { headers: getAuthHeaders() })
+        ]);
 
-const unitSelect = document.getElementById("unitOfMeasure");
-units.forEach(unit => {
-    const opt = document.createElement("option");
-    opt.value = unit;
-    opt.textContent = unit;
-    unitSelect.appendChild(opt);
-});
+        if (!catRes.ok || !unitRes.ok) {
+            throw new Error("Erro ao buscar categorias ou unidades.");
+        }
+
+        const categories = await catRes.json();
+        const units = await unitRes.json();
+
+        const categorySelect = document.getElementById("category");
+        categorySelect.innerHTML = '<option value="">Selecione</option>';
+        categories.forEach(cat => {
+            const opt = document.createElement("option");
+            opt.value = cat;
+            opt.textContent = cat;
+            categorySelect.appendChild(opt);
+        });
+
+        const unitSelect = document.getElementById("unitOfMeasure");
+        unitSelect.innerHTML = '<option value="">Selecione</option>';
+        units.forEach(unit => {
+            const opt = document.createElement("option");
+            opt.value = unit;
+            opt.textContent = unit;
+            unitSelect.appendChild(opt);
+        });
+    } catch (err) {
+        alert("Erro ao carregar categorias e unidades.");
+        console.error(err);
+    }
+}
 
 document.getElementById("btnClear").addEventListener("click", () => {
     document.getElementById("productForm").reset();
 });
 
-document.getElementById("productForm").addEventListener("submit", (e) => {
+document.getElementById("productForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const name = document.getElementById("name").value.trim();
-    const quantity = document.getElementById("quantity").value.trim();
-    const unitPrice = document.getElementById("unitPrice").value.trim();
-    const category = categorySelect.value;
-    const unit = unitSelect.value;
+    const quantity = parseInt(document.getElementById("quantity").value.trim());
+    const unitPrice = parseFloat(document.getElementById("unitPrice").value.trim());
+    const category = document.getElementById("category").value;
+    const unit = document.getElementById("unitOfMeasure").value;
 
-    if (!name || !quantity || !unitPrice || !category || !unit) {
-        alert("Preencha todos os campos!");
+    if (!name || isNaN(quantity) || quantity <= 0 || isNaN(unitPrice) || unitPrice <= 0 || !category || !unit) {
+        alert("Preencha todos os campos corretamente!");
         return;
     }
 
-    if (isNaN(quantity) || quantity <= 0) {
-        alert("Quantidade inválida!");
-        return;
-    }
+    const product = {
+        name,
+        category,
+        unitOfMeasure: unit,
+        unitPrice,
+        quantity
+    };
 
-    if (isNaN(unitPrice) || unitPrice <= 0) {
-        alert("Preço inválido!");
-        return;
-    }
+    try {
+        const response = await fetch("/products", {
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: JSON.stringify(product)
+        });
 
-    alert("Produto adicionado com sucesso!");
-    document.getElementById("productForm").reset();
+        if (!response.ok) {
+            const error = await response.text();
+            alert("Erro ao cadastrar produto: " + error);
+            return;
+        }
+
+        alert("Produto cadastrado com sucesso!");
+        document.getElementById("productForm").reset();
+    } catch (err) {
+        alert("Erro de conexão com o servidor.");
+        console.error(err);
+    }
 });
 
 document.getElementById("menuLeave").addEventListener("click", () => {
     if (confirm("Deseja sair?")) {
-        window.location.href = "../login/index.html";
+        localStorage.clear();
+        window.location.href = "../login.html";
     }
 });
 
-const currentUser = { userType: "ADMIN" };
-if (currentUser.userType === "EMPLOYEE") {
+const role = localStorage.getItem("role");
+if (role === "EMPLOYEE") {
     document.getElementById("menuEditProduct").style.pointerEvents = "none";
     document.getElementById("menuEditProduct").style.opacity = "0.5";
     document.getElementById("menuSalesReport").style.pointerEvents = "none";
     document.getElementById("menuSalesReport").style.opacity = "0.5";
 }
+
+loadCategoriesAndUnits();
