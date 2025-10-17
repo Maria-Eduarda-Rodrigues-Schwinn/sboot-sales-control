@@ -56,6 +56,13 @@ public class SaleService {
               .findById(item.productId())
               .orElseThrow(() -> new SaleValidationException("Produto não encontrado"));
 
+      if (product.getQuantity() < item.quantity())
+        throw new SaleValidationException(
+            "Estoque insuficiente para o produto: " + product.getName());
+
+      product.setQuantity(product.getQuantity() - item.quantity());
+      productRepo.save(product);
+
       var sp =
           SaleProductEntity.builder()
               .id(SaleProductId.builder().saleId(sale.getId()).productId(product.getId()).build())
