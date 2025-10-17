@@ -85,9 +85,9 @@ public class SaleService {
                         SaleProductDTO.builder()
                             .productId(sp.getProduct().getId())
                             .name(sp.getProduct().getName())
-                            .category(sp.getProduct().getCategory())
+                            .category(sp.getProduct().getCategory().getTranslation())
                             .unitPrice(sp.getUnitPrice())
-                            .unitOfMeasure(sp.getProduct().getUnitOfMeasure())
+                            .unitOfMeasure(sp.getProduct().getUnitOfMeasure().getTranslation())
                             .quantity(sp.getQuantity())
                             .build())
                 .toList())
@@ -109,9 +109,10 @@ public class SaleService {
                                     SaleProductDTO.builder()
                                         .productId(sp.getProduct().getId())
                                         .name(sp.getProduct().getName())
-                                        .category(sp.getProduct().getCategory())
+                                        .category(sp.getProduct().getCategory().getTranslation())
                                         .unitPrice(sp.getProduct().getUnitPrice())
-                                        .unitOfMeasure(sp.getProduct().getUnitOfMeasure())
+                                        .unitOfMeasure(
+                                            sp.getProduct().getUnitOfMeasure().getTranslation())
                                         .quantity(sp.getQuantity())
                                         .build())
                             .toList())
@@ -136,7 +137,7 @@ public class SaleService {
               var categoryOk =
                   (isNull(f.category()) || f.category().equals("Todas"))
                       || s.productsSold().stream()
-                          .anyMatch(p -> p.category().getTranslation().equalsIgnoreCase(f.category()));
+                          .anyMatch(p -> p.category().equalsIgnoreCase(f.category()));
               return dateOk && nameOk && categoryOk;
             })
         .toList();
