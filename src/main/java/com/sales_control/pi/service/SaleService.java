@@ -136,7 +136,7 @@ public class SaleService {
               var categoryOk =
                   (isNull(f.category()) || f.category().equals("Todas"))
                       || s.productsSold().stream()
-                          .anyMatch(p -> p.category().name().equalsIgnoreCase(f.category()));
+                          .anyMatch(p -> p.category().getTranslation().equalsIgnoreCase(f.category()));
               return dateOk && nameOk && categoryOk;
             })
         .toList();

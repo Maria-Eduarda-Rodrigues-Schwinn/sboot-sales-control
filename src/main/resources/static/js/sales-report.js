@@ -1,67 +1,74 @@
-let sales = [
-    {
-        id: 1,
-        date: "2025-09-01",
-        products: [
-            { name: "Produto A", price: 10.5, unit: "Unidade", qty: 2, category: "Bebidas" }
-        ],
-        total: 21.0
-    },
-    {
-        id: 2,
-        date: "2025-09-05",
-        products: [
-            { name: "Produto B", price: 5.0, unit: "Kg", qty: 3, category: "Alimentos" }
-        ],
-        total: 15.0
-    }
-];
+function getAuthHeaders() {
+    return {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + localStorage.getItem("token")
+    };
+}
 
-function loadSales(list = sales) {
+let sales = [];
+
+async function loadAllSales() {
+    try {
+        const response = await fetch("/sales", { headers: getAuthHeaders() });
+        if (!response.ok) throw new Error("Erro ao carregar vendas");
+        sales = await response.json();
+        renderSales(sales);
+    } catch (err) {
+        alert(err.message);
+        console.error(err);
+    }
+}
+
+function renderSales(list) {
     const tbody = document.querySelector("#salesTable tbody");
     tbody.innerHTML = "";
     list.forEach(sale => {
-        sale.products.forEach(p => {
+        sale.productsSold.forEach(p => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
-        <td>${sale.id}</td>
-        <td>${sale.date}</td>
-        <td>${p.name}</td>
-        <td>${p.price.toFixed(2)}</td>
-        <td>${p.unit}</td>
-        <td>${p.qty}</td>
-        <td>${sale.total.toFixed(2)}</td>
-      `;
+                <td>${sale.id}</td>
+                <td>${new Date(sale.saleDate).toLocaleDateString("pt-BR")}</td>
+                <td>${p.name}</td>
+                <td>${Number(p.unitPrice || 0).toFixed(2)}</td>
+                <td>${p.unitOfMeasure}</td>
+                <td>${p.quantity}</td>
+                <td>${(p.unitPrice * p.quantity).toFixed(2)}</td>
+            `;
             tbody.appendChild(tr);
         });
     });
 }
 
-document.getElementById("btnFilter").addEventListener("click", () => {
-    const name = document.getElementById("productName").value.toLowerCase();
+document.getElementById("btnFilter").addEventListener("click", async () => {
+    const name = document.getElementById("productName").value;
     const category = document.getElementById("categoryFilter").value;
     const from = document.getElementById("fromDate").value;
     const to = document.getElementById("toDate").value;
 
-    const filtered = sales.filter(sale => {
-        const saleDate = sale.date;
-        const inDateRange = (!from || saleDate >= from) && (!to || saleDate <= to);
-        return inDateRange && sale.products.some(p => {
-            const matchName = !name || p.name.toLowerCase().includes(name);
-            const matchCategory = category === "Todas" || p.category === category;
-            return matchName && matchCategory;
+    try {
+        const params = new URLSearchParams();
+        if (name) params.append("name", name);
+        if (category) params.append("category", category);
+        if (from) params.append("from", from);
+        if (to) params.append("to", to);
+
+        const response = await fetch(`/sales/filter?${params.toString()}`, {
+            headers: getAuthHeaders()
         });
-    });
+        if (!response.ok) throw new Error("Erro ao filtrar vendas");
+        const filtered = await response.json();
 
-    if (filtered.length === 0) {
-        alert("Nenhuma venda encontrada para os critérios especificados.");
+        if (filtered.length === 0) {
+            alert("Nenhuma venda encontrada para os critérios especificados.");
+        }
+        renderSales(filtered);
+    } catch (err) {
+        alert(err.message);
+        console.error(err);
     }
-    loadSales(filtered);
 });
 
-document.getElementById("btnShowAll").addEventListener("click", () => {
-    loadSales();
-});
+document.getElementById("btnShowAll").addEventListener("click", loadAllSales);
 
 document.getElementById("btnExport").addEventListener("click", () => {
     const rows = [["ID Venda", "Data da Venda", "Nome do Produto", "Preço Unitário (R$)", "Unidade", "Quantidade", "Valor Total"]];
@@ -85,16 +92,39 @@ document.getElementById("btnExport").addEventListener("click", () => {
 
 document.getElementById("menuLeave").addEventListener("click", () => {
     if (confirm("Deseja sair?")) {
-        window.location.href = "../login/index.html";
+        localStorage.clear();
+        window.location.href = "../login.html";
     }
 });
 
-const currentUser = { userType: "ADMIN" };
-if (currentUser.userType === "EMPLOYEE") {
+const role = localStorage.getItem("role");
+if (role === "EMPLOYEE") {
     document.getElementById("menuRegisterProduct").style.pointerEvents = "none";
     document.getElementById("menuRegisterProduct").style.opacity = "0.5";
     document.getElementById("menuEditProduct").style.pointerEvents = "none";
     document.getElementById("menuEditProduct").style.opacity = "0.5";
 }
 
-loadSales();
+async function loadCategories() {
+    try {
+        const response = await fetch("/products/categories", { headers: getAuthHeaders() });
+        if (!response.ok) throw new Error("Erro ao carregar categorias");
+        const categories = await response.json();
+
+        const categorySelect = document.getElementById("categoryFilter");
+        categorySelect.innerHTML = '<option value="Todas">Todas</option>';
+
+        categories.forEach(cat => {
+            const opt = document.createElement("option");
+            opt.value = cat;
+            opt.textContent = cat;
+            categorySelect.appendChild(opt);
+        });
+    } catch (err) {
+        console.error(err);
+        alert("Erro ao carregar categorias.");
+    }
+}
+
+loadAllSales();
+loadCategories();
