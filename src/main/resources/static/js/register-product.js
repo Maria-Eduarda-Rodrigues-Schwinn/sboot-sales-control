@@ -12,8 +12,16 @@ async function loadCategoriesAndUnits() {
             fetch("/products/units", { headers: getAuthHeaders() })
         ]);
 
-        if (!catRes.ok || !unitRes.ok) {
-            throw new Error("Erro ao buscar categorias ou unidades.");
+        if (!catRes.ok) {
+            const error = await catRes.json();
+            alert("Erro: " + (error.error || JSON.stringify(error)));
+            throw new Error("Erro ao buscar categorias: " + error);
+        }
+
+        if (!unitRes.ok) {
+            const error = await unitRes.json();
+            alert("Erro: " + (error.error || JSON.stringify(error)));
+            throw new Error("Erro ao buscar unidades: " + error);
         }
 
         const categories = await catRes.json();
@@ -76,9 +84,9 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
         });
 
         if (!response.ok) {
-            const error = await response.text();
-            alert("Erro ao cadastrar produto: " + error);
-            return;
+            const error = await response.json();
+            alert("Erro: " + (error.error || JSON.stringify(error)));
+            throw new Error("Erro ao cadastrar produto: " + error);
         }
 
         alert("Produto cadastrado com sucesso!");

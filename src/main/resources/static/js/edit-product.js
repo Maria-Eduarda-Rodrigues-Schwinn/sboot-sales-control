@@ -10,7 +10,11 @@ let products = [];
 async function loadAllProducts() {
     try {
         const response = await fetch("/products", { headers: getAuthHeaders() });
-        if (!response.ok) throw new Error("Erro ao carregar produtos");
+        if (!response.ok) {
+            const error = await response.json();
+            alert("Erro: " + (error.error || JSON.stringify(error)));
+            throw new Error("Erro ao carregar produtos: " + error);
+        }
         products = await response.json();
         renderProducts(products);
     } catch (err) {
@@ -48,7 +52,11 @@ document.getElementById("btnSearch").addEventListener("click", async () => {
         const response = await fetch(`/products/search?name=${encodeURIComponent(term)}`, {
             headers: getAuthHeaders()
         });
-        if (!response.ok) throw new Error("Erro ao buscar produtos");
+        if (!response.ok) {
+            const error = await response.json();
+            alert("Erro: " + (error.error || JSON.stringify(error)));
+            throw new Error("Erro ao buscar produtos: " + error);
+        }
         const result = await response.json();
         renderProducts(result);
     } catch (err) {
@@ -86,7 +94,8 @@ document.getElementById("btnEdit").addEventListener("click", async () => {
             body: JSON.stringify(update)
         });
         if (!response.ok) {
-            const error = await response.text();
+            const error = await response.json();
+            alert("Erro: " + (error.error || JSON.stringify(error)));
             throw new Error("Erro ao atualizar produto: " + error);
         }
 
@@ -113,7 +122,11 @@ document.getElementById("btnDelete").addEventListener("click", async () => {
             method: "DELETE",
             headers: getAuthHeaders()
         });
-        if (!response.ok) throw new Error("Erro ao excluir produto");
+        if (!response.ok) {
+            const error = await response.json();
+            alert("Erro: " + (error.error || JSON.stringify(error)));
+            throw new Error("Erro ao excluir produto: " + error);
+        }
 
         alert("Produto excluído com sucesso!");
         loadAllProducts();

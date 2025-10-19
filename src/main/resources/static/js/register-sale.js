@@ -11,8 +11,9 @@ function getAuthHeaders() {
 async function loadProducts() {
     const response = await fetch("/products", { headers: getAuthHeaders() });
     if (!response.ok) {
-        alert("Erro ao carregar produtos");
-        return;
+        const error = await response.json();
+        alert("Erro: " + (error.error || JSON.stringify(error)));
+        throw new Error("Erro ao carregar produtos");
     }
     products = await response.json();
 
@@ -95,8 +96,9 @@ document.getElementById("btnAddProduct").addEventListener("click", async () => {
     });
 
     if (!response.ok) {
-        alert("Erro ao adicionar produto ao carrinho");
-        return;
+        const error = await response.json();
+        alert("Erro: " + (error.error || JSON.stringify(error)));
+        throw new Error("Erro ao adicionar produto ao carrinho: " + error);
     }
 
     cart = await response.json();
@@ -119,8 +121,9 @@ document.getElementById("btnRemoveItem").addEventListener("click", async () => {
     });
 
     if (!response.ok) {
-        alert("Erro ao remover item do carrinho");
-        return;
+        const error = await response.json();
+        alert("Erro: " + (error.error || JSON.stringify(error)));
+        throw new Error("Erro ao remover item do carrinho: " + error);
     }
 
     cart = await response.json();
@@ -143,8 +146,9 @@ document.getElementById("btnClearCart").addEventListener("click", async () => {
     });
 
     if (!response.ok) {
-        alert("Erro ao limpar carrinho");
-        return;
+        const error = await response.json();
+        alert("Erro: " + (error.error || JSON.stringify(error)));
+        throw new Error("Erro ao limpar carrinho: " + error);
     }
 
     cart = await response.json();
@@ -173,8 +177,9 @@ document.getElementById("btnFinalizeSale").addEventListener("click", async () =>
     });
 
     if (!response.ok) {
-        alert("Erro ao finalizar a venda.");
-        return;
+        const error = await response.json();
+        alert("Erro: " + (error.error || JSON.stringify(error)));
+        throw new Error("Erro ao finalizar a venda: " + error);
     }
 
     const sale = await response.json();

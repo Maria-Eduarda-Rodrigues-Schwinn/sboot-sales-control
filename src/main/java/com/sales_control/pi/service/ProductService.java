@@ -1,5 +1,6 @@
 package com.sales_control.pi.service;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 import com.sales_control.pi.dto.UpdateProductDTO;
@@ -48,6 +49,9 @@ public class ProductService {
 
   @Transactional
   public ProductResponseDTO update(Integer id, UpdateProductDTO dto) {
+    if (isNull(dto.unitPrice()) && isNull(dto.quantity()))
+      throw new ValidationException("Nenhum campo para atualizar");
+
     var p = repo.findById(id).orElseThrow(() -> new ValidationException("Produto não encontrado"));
     if (nonNull(dto.unitPrice())) {
       if (dto.unitPrice() < 0) throw new ValidationException("Preço inválido");

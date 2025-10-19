@@ -39,6 +39,14 @@ public class SaleService {
     if (isNull(cart.items()) || cart.items().isEmpty())
       throw new SaleValidationException("Carrinho vazio");
 
+    for (var item : cart.items()) {
+      if (isNull(item.productId()) || item.productId() <= 0)
+        throw new SaleValidationException("Produto inválido no carrinho");
+
+      if (isNull(item.quantity()) || item.quantity() <= 0)
+        throw new SaleValidationException("Quantidade inválida para o produto");
+    }
+
     var sale =
         SaleEntity.builder()
             .saleDate(LocalDateTime.now())

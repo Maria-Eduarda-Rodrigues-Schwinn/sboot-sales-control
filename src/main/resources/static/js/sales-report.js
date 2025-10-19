@@ -10,7 +10,11 @@ let sales = [];
 async function loadAllSales() {
     try {
         const response = await fetch("/sales", { headers: getAuthHeaders() });
-        if (!response.ok) throw new Error("Erro ao carregar vendas");
+        if (!response.ok) {
+            const error = await response.json();
+            alert("Erro: " + (error.error || JSON.stringify(error)));
+            throw new Error("Erro ao carregar vendas: " + error);
+        }
         sales = await response.json();
         renderSales(sales);
     } catch (err) {
@@ -55,7 +59,11 @@ document.getElementById("btnFilter").addEventListener("click", async () => {
         const response = await fetch(`/sales/filter?${params.toString()}`, {
             headers: getAuthHeaders()
         });
-        if (!response.ok) throw new Error("Erro ao filtrar vendas");
+        if (!response.ok) {
+            const error = await response.json();
+            alert("Erro: " + (error.error || JSON.stringify(error)));
+            throw new Error("Erro ao filtrar vendas: " + error);
+        }
         const filtered = await response.json();
 
         if (filtered.length === 0) {
@@ -108,7 +116,11 @@ if (role === "EMPLOYEE") {
 async function loadCategories() {
     try {
         const response = await fetch("/products/categories", { headers: getAuthHeaders() });
-        if (!response.ok) throw new Error("Erro ao carregar categorias");
+        if (!response.ok) {
+            const error = await response.json();
+            alert("Erro: " + (error.error || JSON.stringify(error)));
+            throw new Error("Erro ao carregar categorias: " + error);
+        }
         const categories = await response.json();
 
         const categorySelect = document.getElementById("categoryFilter");

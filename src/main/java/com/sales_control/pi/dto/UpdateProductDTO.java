@@ -1,3 +1,6 @@
 package com.sales_control.pi.dto;
 
-public record UpdateProductDTO(Double unitPrice, Integer quantity) {}
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+
+public record UpdateProductDTO(@DecimalMin("0.01") Double unitPrice, @Min(0) Integer quantity) {}

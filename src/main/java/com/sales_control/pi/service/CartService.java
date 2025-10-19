@@ -1,5 +1,7 @@
 package com.sales_control.pi.service;
 
+import static java.util.Objects.isNull;
+
 import com.sales_control.pi.dto.CartItemDTO;
 import com.sales_control.pi.exception.CartOperationException;
 import com.sales_control.pi.repository.ProductRepository;
@@ -16,13 +18,18 @@ public class CartService {
 
   @Transactional
   public void addItem(List<CartItemDTO> cart, Integer productId, Integer qty) {
+    if (isNull(productId) || productId <= 0)
+      throw new CartOperationException("ID de produto inválido");
+
+    if (isNull(qty) || qty <= 0)
+      throw new CartOperationException("Quantidade deve ser maior que zero");
+
     var product =
         productRepo
             .findById(productId)
             .orElseThrow(() -> new CartOperationException("Produto não encontrado"));
 
-    if (qty <= 0 || product.getQuantity() < qty)
-      throw new CartOperationException("Estoque insuficiente");
+    if (product.getQuantity() < qty) throw new CartOperationException("Estoque insuficiente");
 
     var existingItem = cart.stream().filter(i -> i.productId().equals(productId)).findFirst();
 
@@ -41,6 +48,9 @@ public class CartService {
 
   @Transactional
   public void removeItem(List<CartItemDTO> cart, Integer productId) {
+    if (isNull(productId) || productId <= 0)
+      throw new CartOperationException("ID de produto inválido");
+
     var item =
         cart.stream()
             .filter(i -> i.productId().equals(productId))
@@ -57,6 +67,9 @@ public class CartService {
   @Transactional
   public void clearCart(List<CartItemDTO> cart) {
     for (var item : List.copyOf(cart)) {
+      if (isNull(item.productId()) || item.productId() <= 0)
+        throw new CartOperationException("ID de produto inválido");
+
       var p =
           productRepo
               .findById(item.productId())

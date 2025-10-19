@@ -6,6 +6,7 @@ import com.sales_control.pi.dto.response.ProductResponseDTO;
 import com.sales_control.pi.enumeration.CategoryEnum;
 import com.sales_control.pi.enumeration.UnitOfMeasureEnum;
 import com.sales_control.pi.service.ProductService;
+import jakarta.validation.Valid;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -39,12 +40,13 @@ public class ProductController {
   }
 
   @PostMapping
-  public ProductResponseDTO create(@RequestBody CreateProductRequestDTO dto) {
+  public ProductResponseDTO create(@Valid @RequestBody CreateProductRequestDTO dto) {
     return service.create(dto);
   }
 
   @PutMapping("/{id}")
-  public ProductResponseDTO update(@PathVariable Integer id, @RequestBody UpdateProductDTO dto) {
+  public ProductResponseDTO update(
+      @PathVariable Integer id, @Valid @RequestBody UpdateProductDTO dto) {
     return service.update(id, dto);
   }
 
