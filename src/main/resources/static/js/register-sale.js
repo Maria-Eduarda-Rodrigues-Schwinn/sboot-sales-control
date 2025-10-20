@@ -131,11 +131,30 @@ document.getElementById("btnRemoveItem").addEventListener("click", async () => {
     loadProducts();
 });
 
-document.getElementById("btnCalculateTotal").addEventListener("click", () => {
-    const total = cart.reduce((sum, item) => {
-        const product = products.find(p => p.id === item.productId);
-        return sum + item.quantity * (product ? product.unitPrice : 0);
-    }, 0);
+document.getElementById("btnCalculateTotal").addEventListener("click", async () => {
+    const response = await fetch("/sales/calculate-total", {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(cart.map(item => {
+            const product = products.find(p => p.id === item.productId);
+            return {
+                productId: item.productId,
+                name: product ? product.name : "",
+                category: product ? product.category : "",
+                unitPrice: product ? product.unitPrice : 0,
+                unitOfMeasure: product ? product.unitOfMeasure : "",
+                quantity: item.quantity
+            };
+        }))
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        alert("Erro: " + (error.error || JSON.stringify(error)));
+        return;
+    }
+
+    const total = await response.json();
     document.getElementById("totalValue").textContent = `Valor Total: R$ ${total.toFixed(2)}`;
 });
 

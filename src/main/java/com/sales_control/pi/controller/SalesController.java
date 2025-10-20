@@ -3,6 +3,7 @@ package com.sales_control.pi.controller;
 import com.sales_control.pi.dto.CartDTO;
 import com.sales_control.pi.dto.SaleDTO;
 import com.sales_control.pi.dto.SaleFilterDTO;
+import com.sales_control.pi.dto.SaleProductDTO;
 import com.sales_control.pi.service.SaleService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -41,4 +42,9 @@ public class SalesController {
     return saleService.filter(
         SaleFilterDTO.builder().fromDate(from).toDate(to).name(name).category(category).build());
   }
+
+    @PostMapping("/calculate-total")
+    public Double calculateTotalSalesValue(@RequestBody List<SaleProductDTO> items) {
+        return saleService.calculateTotalSalesValue(items);
+    }
 }
