@@ -15,20 +15,24 @@ async function loadProducts() {
         alert("Erro: " + (error.error || JSON.stringify(error)));
         throw new Error("Erro ao carregar produtos");
     }
-    products = await response.json();
 
+    products = await response.json();
     const tbody = document.querySelector("#productsTable tbody");
     tbody.innerHTML = "";
+
     products.forEach(p => {
+        const itemInCart = cart.find(c => c.productId === p.id);
+        const availableQty = p.quantity - (itemInCart ? itemInCart.quantity : 0);
+
         const tr = document.createElement("tr");
         tr.innerHTML = `
-    <td>${p.id}</td>
-    <td>${p.name}</td>
-    <td>${p.category}</td>
-    <td>${Number(p.unitPrice || 0).toFixed(2)}</td>
-    <td>${p.unitOfMeasure}</td>
-    <td>${p.quantity}</td>
-  `;
+            <td>${p.id}</td>
+            <td>${p.name}</td>
+            <td>${p.category}</td>
+            <td>${Number(p.unitPrice || 0).toFixed(2)}</td>
+            <td>${p.unitOfMeasure}</td>
+            <td>${availableQty}</td>
+        `;
         tr.addEventListener("click", () => {
             document.querySelectorAll("#productsTable tr").forEach(row => row.classList.remove("selected"));
             tr.classList.add("selected");
@@ -67,6 +71,7 @@ function renderCart() {
         });
         tbody.appendChild(tr);
     });
+    loadProducts();
 }
 
 async function refreshCart() {
@@ -230,5 +235,5 @@ if (role === "EMPLOYEE") {
     document.getElementById("menuSalesReport").style.opacity = "0.5";
 }
 
-loadProducts();
-refreshCart();
+await loadProducts();
+await refreshCart();

@@ -43,8 +43,8 @@ public class SalesController {
         SaleFilterDTO.builder().fromDate(from).toDate(to).name(name).category(category).build());
   }
 
-    @PostMapping("/calculate-total")
-    public Double calculateTotalSalesValue(@RequestBody List<SaleProductDTO> items) {
-        return saleService.calculateTotalSalesValue(items);
-    }
+  @PostMapping("/calculate-total")
+  public Double calculateTotalSalesValue(@RequestBody List<SaleProductDTO> items) {
+    return saleService.calculateTotalSalesValue(items);
+  }
 }

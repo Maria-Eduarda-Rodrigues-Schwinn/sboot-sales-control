@@ -36,14 +36,11 @@ public class CartService {
     if (existingItem.isPresent()) {
       var item = existingItem.get();
       var newQty = item.quantity() + qty;
-
       cart.remove(item);
       cart.add(CartItemDTO.builder().productId(productId).quantity(newQty).build());
     } else {
       cart.add(CartItemDTO.builder().productId(productId).quantity(qty).build());
     }
-
-    product.setQuantity(product.getQuantity() - qty);
   }
 
   @Transactional
@@ -60,7 +57,6 @@ public class CartService {
         productRepo
             .findById(productId)
             .orElseThrow(() -> new CartOperationException("Produto não encontrado"));
-    p.setQuantity(p.getQuantity() + item.quantity());
     cart.remove(item);
   }
 
@@ -74,7 +70,6 @@ public class CartService {
           productRepo
               .findById(item.productId())
               .orElseThrow(() -> new CartOperationException("Produto não encontrado"));
-      p.setQuantity(p.getQuantity() + item.quantity());
       cart.remove(item);
     }
   }
